@@ -147,8 +147,7 @@ def train(num_gpus, rank, group_name, output_directory, epochs,
         for i, batch in tbar:
             model.zero_grad()
             
-            cond, s, a = [to_gpu(x) for x in batch]
-           
+            cond, a = [to_gpu(x) for x in batch]
             # Get generator outputs
             x = model.encoder(cond)
             g_outputs = model.generator(x)

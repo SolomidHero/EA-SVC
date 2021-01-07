@@ -19,6 +19,7 @@ class Dataset(torch.utils.data.Dataset):
         self.pitch_norm = pitch_norm
         self.segment_length = segment_length
         self.segment_n_frames = segment_length // hop_length
+        self.hop_length = hop_length
         self.sampling_rate = sampling_rate
         random.seed(1234)
 
@@ -37,7 +38,7 @@ class Dataset(torch.utils.data.Dataset):
         self.ppg_files = ppg_files
         
         print("Loading pitch (F0)...")
-        f0_files = [os.path.join(f0_dir, x + '.f0') for x in file_list]
+        f0_files = [os.path.join(f0_dir, x + '.npy') for x in file_list]
         f0_files = [self.parse_f0_file(x) for x in tqdm(f0_files)]
         self.f0_files = f0_files
             
@@ -50,18 +51,16 @@ class Dataset(torch.utils.data.Dataset):
         return ppg
 
     def parse_f0_file(self, f0_file):
-        with open(f0_file) as fin:
-            lines = fin.readlines()
-        f0 = np.asarray([float(x.strip()) for x in lines]) / self.pitch_norm
-        return np.expand_dims(np.asarray(f0), -1).astype(np.float32)
-    
+        f0 = np.load(f0_file).astype(np.float32)
+        return f0
+
     def parse_se_file(self, se_file, train_list):
         se_dict = {}
         with open(se_file) as fin:
             for line in fin.readlines():
                 segs = line.strip().split()
                 se_dict[segs[0]] = np.asarray([float(x)
-                    for x in segs[2: -1]]).astype(np.float32)
+                    for x in segs[1:]]).astype(np.float32)
         return np.asarray([se_dict[x] for x in train_list])
 
     def parse_input(self, index):

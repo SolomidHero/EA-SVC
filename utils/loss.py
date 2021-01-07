@@ -50,13 +50,14 @@ class STFTLoss(nn.Module):
     def __init__(self,
                  fft_size,
                  hop_size,
-                 win_size):
+                 win_size,
+                 device='cuda'):
         super(STFTLoss, self).__init__()
         
         self.fft_size = fft_size
         self.hop_size = hop_size
         self.win_size = win_size
-        self.window = torch.hann_window(win_size)
+        self.window = torch.hann_window(win_size, device=device)
         self.sc_loss = SpectralConvergence()
         self.mag_loss = LogSTFTMagnitude()
         
