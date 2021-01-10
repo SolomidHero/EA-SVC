@@ -40,5 +40,9 @@
         "embedding_size": 64
     },
 
-    "discriminator_config": null
+    "discriminator_config": {
+        "multiscales": [2, 2, 2],
+        "downsample_scales": [4, 4, 4, 4],
+        "max_channels": 512
+    }
 }
