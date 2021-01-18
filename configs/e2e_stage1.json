@@ -34,7 +34,7 @@
     },
 
     "encoder_config": {
-        "n_in_channels": [101, 1, 1024],
+        "n_in_channels": [1024, 1, 512],
         "n_out_channels": [64, 64, 64],
         "n_hidden_channels": [128, 128, 128],
         "embedding_size": 64

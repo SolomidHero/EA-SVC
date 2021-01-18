@@ -183,7 +183,7 @@ def main(train_file, config, stdout_dir, args_str):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', '--main', type=str, required=True,
-                        help='Main file for trianing')
+                        help='Main file for training')
     parser.add_argument('-c', '--config', type=str, required=True,
                         help='JSON file for configuration')
     parser.add_argument('-s', '--stdout_dir', type=str, default=".",
