@@ -76,11 +76,12 @@ class TestSet(Dataset):
         self.sampling_rate = sampling_rate
         
         data_dir = os.path.dirname(file_list)
-        sp_dir = os.path.join(data_dir, 'mels')
-        f0_dir = os.path.join(data_dir, 'f0_reaper')
-        se_files = os.path.join(data_dir, 'utt_emb_sing3.ark')
-        
+        # sp_dir = os.path.join(data_dir, 'mels')
+        # f0_dir = os.path.join(data_dir, 'f0_reaper')
+        # se_files = os.path.join(data_dir, 'utt_emb_sing3.ark')
+
         file_list = utils.files_to_list(file_list)
+
         self.file_list = ['_'.join(x.split('|')) for x in file_list]
         ppg_list, f0_list, se_list = zip(*[x.split('|') for x in file_list])
 
@@ -90,10 +91,10 @@ class TestSet(Dataset):
             self.ppg_files = ppg_files
         
         if 'f' in feat_used:
-            f0_files = [os.path.join(f0_dir, x + '.f0') for x in ppg_list]
+            f0_files = [os.path.join(f0_dir, x + '.npy') for x in ppg_list]
             f0_files = [self.parse_f0_file(x) for x in tqdm(f0_files)]
             
-            target_f0 = [os.path.join(f0_dir, x + '.f0') for x in se_list]
+            target_f0 = [os.path.join(f0_dir, x + '.npy') for x in se_list]
             target_f0 = [self.parse_f0_file(x) for x in tqdm(target_f0)]
 
             f0_files = [adapt_f0(x, target_f0[i]) for i, x in enumerate(f0_files)]
@@ -102,8 +103,7 @@ class TestSet(Dataset):
             self.f0_files = f0_files
         
         if 's' in feat_used:
-            se_files = self.parse_se_file(se_files, se_list)
-            self.se_files = se_files
+            self.se_files = self.parse_se_file(se_files, se_list)
         
         if 'a' in feat_used and encoder_config['speaker_input'] == 'audio':
             ref_files = [os.path.join(sp_dir, x + '.npy') for x in tqdm(se_list)]
@@ -121,7 +121,7 @@ class TestSet(Dataset):
         with open(se_file) as fin:
             for line in fin.readlines():
                 segs = line.strip().split()
-                se_dict[segs[0]] = np.asarray([float(x) for x in segs[2: -1]])
+                se_dict[segs[0]] = np.asarray([float(x) for x in segs[1:]])
         outputs = []
         for x in train_list:
             if x not in se_dict:
@@ -145,6 +145,7 @@ def main(model_filename, pitch_model_filename, output_dir, batch_size):
         pitch_model.eval()
 
     testset = TestSet(**(data_config))
+    cond, name = testset[0]
     for files in chunker(testset, batch_size):
         files = list(zip(*files))
         cond_input, file_paths = files[: -1], files[-1]
