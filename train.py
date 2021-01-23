@@ -86,13 +86,16 @@ def train(num_gpus, rank, group_name, output_directory, epochs,
         model = apply_gradient_allreduce(model)
     #=====END:   ADDED FOR DISTRIBUTED======
     
+    # Using RAdam as optimizer
+    # Lookahead has resume training issues:
+    # lr schedule doesn't affect nested RAdam of Lookahead
     g_parameters = list(model.generator.parameters())
     g_parameters = list(model.encoder.parameters()) + g_parameters
-    g_optimizer = Lookahead(RAdam(g_parameters, lr=g_learning_rate))
+    g_optimizer = RAdam(g_parameters, lr=g_learning_rate)
 
     d_parameters = list(model.discriminator.parameters())
     d_parameters = list(model.disentangler.parameters()) + d_parameters
-    d_optimizer = Lookahead(RAdam(d_parameters, lr=d_learning_rate))
+    d_optimizer = RAdam(d_parameters, lr=d_learning_rate)
     
     # Load checkpoint if one exists
     iteration = 0
