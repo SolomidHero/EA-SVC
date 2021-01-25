@@ -4,8 +4,9 @@ import os
 import torch
 import numpy as np
 
-
-MAX_WAV_VALUE = 32768.0
+# 32768.0 for uint16 stored wav
+# 1.0 for float32 stored wav
+MAX_WAV_VALUE = 1.0
 
 
 def load_wav_to_torch(full_path):
